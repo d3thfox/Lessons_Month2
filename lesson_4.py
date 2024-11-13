@@ -1,4 +1,4 @@
-choice
+from random import randint, choice
 
 
 class GameEntity:
