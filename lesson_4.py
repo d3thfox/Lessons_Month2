@@ -1,4 +1,4 @@
-from random import randint, choice
+choice
 
 
 class GameEntity:
@@ -91,8 +91,9 @@ class Magic(Hero):
         super().__init__(name, health, damage, 'BOOST')
 
     def apply_super_power(self, boss, heroes):
-        pass
-        # TODO Here will be implementation of BOOSTING
+        for hero in heroes:
+            if hero.health > 0 and self != hero and type(hero) != Witcher:
+                hero.damage += 10
 
 
 class Berserk(Hero):
@@ -122,6 +123,58 @@ class Medic(Hero):
         for hero in heroes:
             if hero.health > 0 and self != hero:
                 hero.health += self.__heal_points
+
+
+class Witcher(Hero):
+    def __init__(self, name, health, ):
+        super().__init__(name, health, damage=0, ability="resurrection")
+
+    def apply_super_power(self, boss, heroes):
+        for hero in heroes:
+            if hero.health <= 0 and self != hero:
+                hero.health += self.health
+                self.health = 0
+                print(f"{self.name} resurrection {hero.name} passing on your health")
+
+class Hacker(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, "Hacking")
+
+    def apply_super_power(self, boss, heroes):
+        global round_number
+        if boss.health > 0 and round_number % 2 == 0:
+            hack = randint(10, 20)
+            boss.health -= hack
+            selected_hero = choice(heroes)
+            selected_hero.health += hack
+            print(f"{self.name} hacking boss on {hack} health points and return their {selected_hero.name}")
+
+class Deku(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, ability="one for all")
+
+    def apply_super_power(self, boss, heroes):
+        random = choice([1,2])
+        choices = choice([1.2, 1.5, 2])
+        if random == 1:
+            boss.health -= self.damage * choices
+            self.health -= choices * 10
+            print(f"Deku power up on and hit boss on {self.damage * choices} and downgraded hp in {choices * 10}")
+
+class Ludoman(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, ability="poker")
+
+    def apply_super_power(self, boss, heroes):
+        bone_1 = randint(1, 6)
+        bone_2 = randint(1, 6)
+        if bone_1 == bone_2:
+            boss.health -= (bone_1 + bone_2)
+            print(f"{self.name} win on bones and downgrade hp {boss.name} on {bone_2 + bone_1}")
+        else:
+            choices_hero = choice(heroes)
+            choices_hero.health -= bone_1 + bone_2
+            print(f"{self.name} lost on bones and downgrade hp {choices_hero.name} on {bone_2 + bone_1}")
 
 
 round_number = 0
@@ -163,13 +216,17 @@ def is_game_over(boss, heroes):
 
 def start_game():
     boss = Boss(name='Dragon', health=1000, damage=50)
-    warrior_1 = Warrior(name='Mario', health=270, damage=10)
+    warrior_1 = Warrior(name='Mario', health=280, damage=10)
     warrior_2 = Warrior(name='Ben', health=280, damage=15)
     magic = Magic(name='Merlin', health=290, damage=10)
     berserk = Berserk(name='Guts', health=260, damage=5)
     doc = Medic(name='Aibolit', health=250, damage=5, heal_points=15)
     assistant = Medic(name='Kristin', health=300, damage=5, heal_points=5)
-    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant]
+    witcher = Witcher(name='Geralt', health=280, )
+    hacker = Hacker(name="Anonimus", health=240, damage=5)
+    deku = Deku(name="Midoria", health=220, damage=15)
+    ludoman = Ludoman(name="Joker",health=210,damage=10)
+    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant, witcher, hacker, deku, ludoman]
 
     show_statistics(boss, heroes_list)
     while not is_game_over(boss, heroes_list):
